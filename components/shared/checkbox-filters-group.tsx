@@ -1,7 +1,7 @@
 'use client'
 
 import { ChangeEvent, useState } from 'react'
-import { Input } from '../ui'
+import { Input, Skeleton } from '../ui'
 import { FilterCheckbox, FilterCheckboxProps } from './filter-checkbox'
 
 type Item = FilterCheckboxProps
@@ -11,6 +11,7 @@ interface Props {
 	items: Item[]
 	defaultItems: Item[]
 	limit?: number
+	loading?: boolean
 	searchInputPlaceholder?: string
 	onChange?: (values: string[]) => void
 	defaultValue?: string[]
@@ -22,6 +23,7 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 	items,
 	defaultItems,
 	limit = 5,
+	loading = false,
 	searchInputPlaceholder = 'Поиск...',
 	className,
 	onChange,
@@ -34,7 +36,25 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 		setSearchValue(e.target.value)
 	}
 
-  const list = showAll ? items.filter((item) => item.text.toLowerCase().includes(searchValue.toLowerCase())) : defaultItems?.slice(0, limit)
+	if (loading) {
+		return (
+			<div className={className}>
+				<p className='font-bold mb-3'></p>
+
+				{...Array(limit)
+					.fill(0)
+					.map((_, index) => <Skeleton className='h-6 mb-4 rounded-[8px]' />)}
+
+				<Skeleton className='w-28 h-6 mb-4 rounded-[8px]' />
+			</div>
+		)
+	}
+
+	const list = showAll
+		? items.filter(item =>
+				item.text.toLowerCase().includes(searchValue.toLowerCase())
+		  )
+		: defaultItems?.slice(0, limit)
 
 	return (
 		<div className={className}>
